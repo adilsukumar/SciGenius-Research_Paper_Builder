@@ -67,8 +67,9 @@ def expand_idea(req: IdeaRequest):
 async def ingest_pdf(project_name: str = Form(...), file: UploadFile = File(...)):
     try:
         # Save file temporarily
-        os.makedirs("data/uploads", exist_ok=True)
-        file_path = f"data/uploads/{file.filename}"
+        upload_dir = "/tmp/uploads" if os.getenv("VERCEL") == "1" else "data/uploads"
+        os.makedirs(upload_dir, exist_ok=True)
+        file_path = f"{upload_dir}/{file.filename}"
         with open(file_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
             
@@ -83,7 +84,7 @@ async def ingest_pdf(project_name: str = Form(...), file: UploadFile = File(...)
         graph_summary = builder.get_summary()
         
         # We don't save graph_summary to SQLite in this basic version, we can just return it or save to a file
-        summary_path = f"data/uploads/{project_name}_graph.txt"
+        summary_path = f"{upload_dir}/{project_name}_graph.txt"
         with open(summary_path, "w") as f:
             f.write(graph_summary)
             
@@ -96,7 +97,8 @@ def generate_and_humanize(req: GenerateRequest):
     try:
         project_data = db.load_checkpoint(req.project_name)
         
-        summary_path = f"data/uploads/{req.project_name}_graph.txt"
+        upload_dir = "/tmp/uploads" if os.getenv("VERCEL") == "1" else "data/uploads"
+        summary_path = f"{upload_dir}/{req.project_name}_graph.txt"
         graph_summary = ""
         if os.path.exists(summary_path):
             with open(summary_path, "r") as f:
@@ -111,8 +113,10 @@ def generate_and_humanize(req: GenerateRequest):
         db.save_checkpoint(req.project_name, "lit_review", final_lit_review)
         
         # Export automatically
+        export_dir = "/tmp/exports" if os.getenv("VERCEL") == "1" else "data/exports"
+        os.makedirs(export_dir, exist_ok=True)
         outline = project_data.get("idea_outline", "")
-        export_path = f"data/exports/{req.project_name}.md"
+        export_path = f"{export_dir}/{req.project_name}.md"
         Formatter.export_to_markdown(req.project_name, outline, final_lit_review, export_path)
         
         return {"status": "success", "lit_review": final_lit_review, "export_path": export_path}
