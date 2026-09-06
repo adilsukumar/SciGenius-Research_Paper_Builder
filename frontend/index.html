@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SciGenius - AI Research Assistant</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <div class="glass-background">
+      <!-- Decorative Orbs -->
+      <div class="orb orb-1"></div>
+      <div class="orb orb-2"></div>
+      <div class="orb orb-3"></div>
+      
+      <div class="app-container">
+        <header>
+          <h1>SciGenius <span class="badge">PRO</span></h1>
+          <p>Automated Knowledge Graph & Humanized Research Generator</p>
+        </header>
+
+        <main id="app">
+          <!-- Wizard Step 1: Initialize -->
+          <div id="step-1" class="wizard-card active">
+            <h2>Start a Project</h2>
+            <div class="input-group">
+              <label for="projectName">Project Name</label>
+              <input type="text" id="projectName" placeholder="e.g. quantum-computing-2026">
+            </div>
+            <button id="btnInit" class="btn-primary">Initialize Project <i data-lucide="arrow-right"></i></button>
+            <div id="initError" class="error-text"></div>
+          </div>
+
+          <!-- Wizard Step 2: Idea Expansion -->
+          <div id="step-2" class="wizard-card">
+            <h2>Research Idea</h2>
+            <p class="subtitle">Describe your idea, and SciGenius will expand it into an academic outline.</p>
+            <div class="input-group">
+              <textarea id="userIdea" rows="4" placeholder="I want to write a paper about..."></textarea>
+            </div>
+            <button id="btnExpand" class="btn-primary">Generate Outline <i data-lucide="sparkles"></i></button>
+            <div class="loader" id="loaderExpand" style="display:none;"></div>
+            <div id="outlineResult" class="result-box markdown-body"></div>
+            <button id="btnNextToIngest" class="btn-secondary" style="display:none;">Continue to PDF Ingestion</button>
+          </div>
+
+          <!-- Wizard Step 3: PDF Ingestion -->
+          <div id="step-3" class="wizard-card">
+            <h2>Knowledge Graph Ingestion</h2>
+            <p class="subtitle">Upload a reference PDF to extract concepts and build a Semantic Knowledge Graph.</p>
+            
+            <div class="file-upload-wrapper">
+              <input type="file" id="pdfUpload" accept=".pdf">
+              <div class="file-upload-box">
+                <i data-lucide="upload-cloud"></i>
+                <span>Click or drag a PDF here</span>
+              </div>
+            </div>
+            
+            <button id="btnIngest" class="btn-primary">Build Graph <i data-lucide="network"></i></button>
+            <div class="loader" id="loaderIngest" style="display:none;"></div>
+            
+            <div id="graphResult" class="result-box markdown-body"></div>
+            <button id="btnNextToHumanize" class="btn-secondary" style="display:none;">Continue to Lit Review</button>
+          </div>
+
+          <!-- Wizard Step 4: Humanize -->
+          <div id="step-4" class="wizard-card">
+            <h2>Literature Review & Humanizer</h2>
+            <p class="subtitle">Generating a comprehensive, humanized literature review based on the Knowledge Graph.</p>
+            
+            <button id="btnHumanize" class="btn-primary">Generate & Humanize <i data-lucide="cpu"></i></button>
+            <div class="loader" id="loaderHumanize" style="display:none;"></div>
+            
+            <div id="litReviewResult" class="result-box markdown-body"></div>
+            <div id="exportPath" class="success-text"></div>
+          </div>
+        </main>
+      </div>
+    </div>
+    <script type="module" src="/style.css"></script>
+    <script type="module" src="/main.js"></script>
+  </body>
+</html>

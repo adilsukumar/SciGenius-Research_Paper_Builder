@@ -1,0 +1,8 @@
+google-generativeai
+spacy
+networkx
+rich
+pypdf
+python-dotenv
+pytest
+pydantic
