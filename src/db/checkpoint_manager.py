@@ -24,7 +24,7 @@ class CheckpointManager:
                         project_name TEXT UNIQUE,
                         idea_outline TEXT,
                         lit_review TEXT,
-                        humanized_text TEXT,
+                        refined_text TEXT,
                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                     )
                 ''')
@@ -35,7 +35,7 @@ class CheckpointManager:
             
     def save_checkpoint(self, project_name: str, key: str, value: str):
         """Saves a specific section to the project's checkpoint."""
-        valid_keys = ['idea_outline', 'lit_review', 'humanized_text']
+        valid_keys = ['idea_outline', 'lit_review', 'refined_text']
         if key not in valid_keys:
             raise ValueError(f"Invalid checkpoint key. Must be one of {valid_keys}")
             

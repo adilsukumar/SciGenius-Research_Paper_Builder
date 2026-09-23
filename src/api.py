@@ -3,6 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import os
 import shutil
+import re
+from pathlib import Path
 
 from src.config import config
 from src.exceptions import ConfigurationError, GenerationError
@@ -12,7 +14,7 @@ from src.graph.relation_extractor import RelationExtractor
 from src.graph.builder import GraphBuilder
 from src.generation.idea_expander import IdeaExpander
 from src.generation.lit_review import LiteratureReviewGenerator
-from src.generation.humanizer_engine import HumanizerEngine
+from src.generation.style_editor import StyleEditor
 from src.db.checkpoint_manager import CheckpointManager
 from src.export.formatter import Formatter
 from src.logger import log
@@ -23,7 +25,7 @@ app = FastAPI(title="SciGenius API")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=True,
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -40,6 +42,14 @@ class IdeaRequest(BaseModel):
 
 class GenerateRequest(BaseModel):
     project_name: str
+
+
+def safe_project_name(value: str) -> str:
+    """Return a filesystem-safe project identifier."""
+    cleaned = re.sub(r"[^A-Za-z0-9._-]+", "-", value).strip(".-")
+    if not cleaned:
+        raise HTTPException(status_code=400, detail="Project name must contain letters or numbers.")
+    return cleaned[:100]
     
 @app.on_event("startup")
 def startup_event():
@@ -66,10 +76,15 @@ def expand_idea(req: IdeaRequest):
 @app.post("/api/ingest")
 async def ingest_pdf(project_name: str = Form(...), file: UploadFile = File(...)):
     try:
+        if Path(file.filename or "").suffix.lower() != ".pdf":
+            raise HTTPException(status_code=400, detail="Only PDF uploads are supported.")
+
         # Save file temporarily
         upload_dir = "/tmp/uploads" if os.getenv("VERCEL") == "1" else "data/uploads"
         os.makedirs(upload_dir, exist_ok=True)
-        file_path = f"{upload_dir}/{file.filename}"
+        project_id = safe_project_name(project_name)
+        upload_name = Path(file.filename or "source.pdf").name
+        file_path = os.path.join(upload_dir, f"{project_id}-{upload_name}")
         with open(file_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
             
@@ -84,21 +99,24 @@ async def ingest_pdf(project_name: str = Form(...), file: UploadFile = File(...)
         graph_summary = builder.get_summary()
         
         # We don't save graph_summary to SQLite in this basic version, we can just return it or save to a file
-        summary_path = f"{upload_dir}/{project_name}_graph.txt"
+        summary_path = os.path.join(upload_dir, f"{project_id}_graph.txt")
         with open(summary_path, "w") as f:
             f.write(graph_summary)
             
         return {"status": "success", "graph_summary": graph_summary}
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/api/humanize")
-def generate_and_humanize(req: GenerateRequest):
+@app.post("/api/refine")
+def generate_and_refine(req: GenerateRequest):
     try:
         project_data = db.load_checkpoint(req.project_name)
+        project_id = safe_project_name(req.project_name)
         
         upload_dir = "/tmp/uploads" if os.getenv("VERCEL") == "1" else "data/uploads"
-        summary_path = f"{upload_dir}/{req.project_name}_graph.txt"
+        summary_path = os.path.join(upload_dir, f"{project_id}_graph.txt")
         graph_summary = ""
         if os.path.exists(summary_path):
             with open(summary_path, "r") as f:
@@ -107,8 +125,8 @@ def generate_and_humanize(req: GenerateRequest):
         lit_gen = LiteratureReviewGenerator()
         lit_review_draft = lit_gen.generate(req.project_name, graph_summary)
         
-        humanizer = HumanizerEngine()
-        final_lit_review = humanizer.humanize(lit_review_draft)
+        editor = StyleEditor()
+        final_lit_review = editor.edit(lit_review_draft)
         
         db.save_checkpoint(req.project_name, "lit_review", final_lit_review)
         
@@ -116,7 +134,7 @@ def generate_and_humanize(req: GenerateRequest):
         export_dir = "/tmp/exports" if os.getenv("VERCEL") == "1" else "data/exports"
         os.makedirs(export_dir, exist_ok=True)
         outline = project_data.get("idea_outline", "")
-        export_path = f"{export_dir}/{req.project_name}.md"
+        export_path = os.path.join(export_dir, f"{project_id}.md")
         Formatter.export_to_markdown(req.project_name, outline, final_lit_review, export_path)
         
         return {"status": "success", "lit_review": final_lit_review, "export_path": export_path}
