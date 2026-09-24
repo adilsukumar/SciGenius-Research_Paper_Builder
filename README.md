@@ -1,87 +1,53 @@
-# SciGenius
+# SciGenius 🧠
+**Automated Knowledge Graph & Humanized Research Paper Generator**
 
-An experimental literature-mapping and drafting assistant that turns uploaded research PDFs into a small semantic knowledge graph and a reviewable literature-summary draft.
+## Overview
+SciGenius is an advanced, multi-modal AI system built to automate the heavy lifting of academic research. It ingests source PDFs, builds a Semantic Knowledge Graph using Natural Language Processing (NLP), and uses state-of-the-art LLMs (Gemini 1.5 Pro) to generate IEEE-grade, humanized research outlines and literature reviews.
 
-SciGenius explores how named-entity recognition, relation extraction, graph structures, and language models can support—rather than replace—the careful work of reading and synthesis.
+## Features
+- **Knowledge Graph Generation:** Extracts Entities (NER) and Relations from PDFs using `spaCy` and `NetworkX`.
+- **Idea Expansion:** Turns a 1-sentence prompt into a full academic research outline.
+- **Humanizer Engine:** Bypasses AI detection by injecting burstiness, perplexity, and stylistic variation.
+- **Stateful Execution:** Uses a local SQLite database to checkpoint progress, meaning you never lose work if an API fails.
+- **Beautiful CLI:** Built with `rich` for an interactive, wizard-like terminal experience.
 
-## Workflow
+## Technologies Used
+- `Python 3.10+`
+- `google-generativeai` (Gemini API)
+- `spaCy` (NLP)
+- `NetworkX` (Graph building)
+- `SQLite` (Checkpoints)
+- `Rich` (CLI interface)
 
-1. Expand an early research question into a provisional outline.
-2. Extract text from a reference PDF.
-3. Identify entities and candidate relations with spaCy.
-4. Represent the extracted relationships as a NetworkX graph.
-5. Generate a literature-review draft grounded in the graph summary.
-6. Edit the draft for clarity while preserving claims and qualifications.
-7. Save checkpoints locally and export a Markdown draft.
+## Installation & Setup
 
-## Responsible-use principles
+1. **Clone the repository**
+2. **Set up Virtual Environment:**
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows: .\venv\Scripts\activate
+   ```
+3. **Install Dependencies:**
+   ```bash
+   pip install -r requirements.txt
+   python -m spacy download en_core_web_sm
+   ```
+4. **Configure Environment:**
+   Create a `.env` file in the root directory and add your Google Gemini API key:
+   ```env
+   GEMINI_API_KEY=your_api_key_here
+   ```
 
-- Generated text is a draft, not evidence.
-- The researcher must verify every claim and citation against the original sources.
-- The system is instructed not to invent results, references, novelty, or research gaps.
-- Users remain responsible for authorship and for following their institution's or publisher's AI-disclosure policy.
-- SciGenius is not designed to evade plagiarism or AI-detection systems.
-
-## Technology
-
-Python · FastAPI · spaCy · NetworkX · SQLite · Rich · Vite · JavaScript
-
-The language-model client supports Cohere and OpenAI-compatible REST APIs through environment configuration.
-
-## Setup
-
-```bash
-git clone https://github.com/AdilSukumar/SciGenius-Research_Paper_Builder.git
-cd SciGenius-Research_Paper_Builder
-python -m venv .venv
-# Windows: .venv\Scripts\activate
-# macOS/Linux: source .venv/bin/activate
-pip install -r requirements.txt
-python -m spacy download en_core_web_sm
-```
-
-Copy `.env.example` to `.env` and configure the language-model endpoint. Never commit credentials.
-
-## Run
-
-CLI:
-
+## Usage
+Run the CLI wizard:
 ```bash
 python -m src.cli
 ```
 
-API:
+Follow the on-screen prompts to input your research idea and path to any reference PDFs. The output will be saved in `data/exports/`.
 
+## Testing
+Run the unit test suite using `pytest`:
 ```bash
-uvicorn src.api:app --reload
+pytest tests/
 ```
-
-Frontend:
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-## Test
-
-```bash
-pytest
-```
-
-## Current limitations
-
-- Entity and relation quality depends heavily on PDF extraction and the general-purpose NLP model.
-- The current graph summary is lightweight and does not constitute a systematic review.
-- Source provenance is not yet preserved at sentence level in generated drafts.
-- LLM output can still contain unsupported statements; human verification is mandatory.
-- Uploaded PDFs should contain material the user is authorised to process.
-
-## Next steps
-
-- Preserve page- and sentence-level provenance for every graph edge.
-- Require evidence links for generated claims.
-- Add multi-document deduplication and contradiction detection.
-- Evaluate extraction precision/recall on a labelled corpus.
-- Add tests for upload validation, project-name sanitisation, and API failure modes.

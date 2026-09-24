@@ -15,7 +15,7 @@ from src.graph.relation_extractor import RelationExtractor
 from src.graph.builder import GraphBuilder
 from src.generation.idea_expander import IdeaExpander
 from src.generation.lit_review import LiteratureReviewGenerator
-from src.generation.style_editor import StyleEditor
+from src.generation.humanizer_engine import HumanizerEngine
 from src.db.checkpoint_manager import CheckpointManager
 from src.export.formatter import Formatter
 
@@ -25,7 +25,7 @@ class SciGeniusCLI:
     """The interactive command-line interface for SciGenius."""
     
     def __init__(self):
-        console.print(Panel.fit("[bold blue]SciGenius[/bold blue] 🧠\n[italic]Literature mapping and drafting assistant[/italic]"))
+        console.print(Panel.fit("[bold blue]SciGenius[/bold blue] 🧠\n[italic]Automated Knowledge Graph & Humanized Research Paper Generator[/italic]"))
         self.db = CheckpointManager()
         
     def check_setup(self):
@@ -92,13 +92,13 @@ class SciGeniusCLI:
                 lit_gen = LiteratureReviewGenerator()
                 lit_review_draft = lit_gen.generate(project_name, graph_summary)
             
-            # Step 4: clarity and style edit
-            with console.status("[bold green]Editing the draft for clarity and consistency...[/bold green]"):
-                editor = StyleEditor()
-                final_lit_review = editor.edit(lit_review_draft)
+            # Step 4: Humanizer
+            with console.status("[bold green]Applying Humanizer Engine to evade AI detection...[/bold green]"):
+                humanizer = HumanizerEngine()
+                final_lit_review = humanizer.humanize(lit_review_draft)
                 
             self.db.save_checkpoint(project_name, "lit_review", final_lit_review)
-            console.print("[green]Draft generated. Verify every claim and citation before use.[/green]")
+            console.print("[green]Literature Review successfully generated and humanized![/green]")
         else:
             console.print("[cyan]Skipping Step 3 (Loaded from checkpoint)[/cyan]")
             final_lit_review = project_data['lit_review']

@@ -19,7 +19,7 @@
       <div class="app-container">
         <header>
           <h1>SciGenius <span class="badge">PRO</span></h1>
-          <p>Literature mapping and drafting assistant</p>
+          <p>Automated Knowledge Graph & Humanized Research Generator</p>
         </header>
 
         <main id="app">
@@ -64,16 +64,16 @@
             <div class="loader" id="loaderIngest" style="display:none;"></div>
             
             <div id="graphResult" class="result-box markdown-body"></div>
-            <button id="btnNextToRefine" class="btn-secondary" style="display:none;">Continue to Lit Review</button>
+            <button id="btnNextToHumanize" class="btn-secondary" style="display:none;">Continue to Lit Review</button>
           </div>
 
-          <!-- Wizard Step 4: Draft and refine -->
+          <!-- Wizard Step 4: Humanize -->
           <div id="step-4" class="wizard-card">
-            <h2>Literature Review Draft</h2>
-            <p class="subtitle">Generate a source-grounded draft and edit it for clarity. Verify every claim and citation before use.</p>
+            <h2>Literature Review & Humanizer</h2>
+            <p class="subtitle">Generating a comprehensive, humanized literature review based on the Knowledge Graph.</p>
             
-            <button id="btnRefine" class="btn-primary">Generate Draft <i data-lucide="cpu"></i></button>
-            <div class="loader" id="loaderRefine" style="display:none;"></div>
+            <button id="btnHumanize" class="btn-primary">Generate & Humanize <i data-lucide="cpu"></i></button>
+            <div class="loader" id="loaderHumanize" style="display:none;"></div>
             
             <div id="litReviewResult" class="result-box markdown-body"></div>
             <div id="exportPath" class="success-text"></div>

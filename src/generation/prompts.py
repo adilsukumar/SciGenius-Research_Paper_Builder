@@ -1,32 +1,33 @@
-STYLE_EDIT_PROMPT = """
-You are editing an academic draft for clarity, precision, and readability.
+HUMANIZE_PROMPT = """
+You are an expert academic researcher writing a paper for a prestigious IEEE/Scopus journal.
+Your task is to take the following AI-generated draft and rewrite it to sound completely human, bypassing AI detection systems like Turnitin or GPTZero.
 
-Requirements:
-1. Preserve the author's claims, qualifications, citations, and technical meaning.
-2. Do not invent evidence, references, numerical results, or methods.
-3. Prefer direct language and remove repetition or unsupported emphasis.
-4. Keep uncertainty explicit and distinguish source findings from the author's interpretation.
-5. Return only the revised draft. The researcher will verify it against the source material and disclose AI assistance where required by their institution or publisher.
+CRITICAL INSTRUCTIONS FOR HUMANIZATION:
+1. **Vary Sentence Structure**: Use a mix of short, punchy sentences and longer, complex sentences. AI text is typically too uniform in sentence length.
+2. **Increase Perplexity**: Use less predictable word choices. Avoid common AI phrases like "In conclusion," "It is important to note that," "Delving into," or "A tapestry of".
+3. **Burstiness**: Humans write in bursts. Sometimes they string together several short clauses; other times they write a very long, flowing sentence. Mimic this.
+4. **Academic Tone**: Maintain a highly rigorous, objective, and scholarly tone suitable for an IEEE/Scopus journal.
+5. **No AI Signatures**: Do not apologize, do not say "As an AI", just output the rewritten text.
 
 Original Draft:
 {draft}
 
-Revised Draft:
+Rewritten Humanized Section:
 """
 
 IDEA_EXPANSION_PROMPT = """
-You are helping a researcher turn an early idea into a structured outline for critical review.
-Do not claim novelty, results, or references that have not been supplied.
+You are a brilliant PhD advisor in Computer Science/Engineering. A student has come to you with a rough idea for a research paper. 
+Your task is to expand this brief idea into a comprehensive, robust research outline suitable for a top-tier journal.
 
 Student's Idea:
 {idea}
 
 Please output a structured outline including:
-1. Working Title
-2. Draft Abstract (clearly framed as a proposal, not completed research)
+1. Proposed Title (Catchy and academic)
+2. Abstract (A 250-word summary of the proposed innovation)
 3. Problem Statement (Clear and concise)
 4. Proposed Methodology (High-level architecture or approach)
-5. Proposed Contributions and assumptions that still need validation
+5. Expected Contributions (Why this is novel)
 """
 
 LIT_REVIEW_PROMPT = """
@@ -40,5 +41,6 @@ Research Topic:
 {topic}
 
 Task:
-Draft a literature-review section of up to 500 words using only the supplied graph context. Synthesize relationships rather than listing concepts. Clearly flag missing evidence and do not fabricate citations, findings, or research gaps.
+Write a comprehensive 500-word Literature Review. Synthesize the concepts and relationships from the Knowledge Graph. Highlight the gaps in the current literature that our research topic addresses.
+Do NOT simply list the concepts. Weave them into a cohesive academic narrative.
 """
