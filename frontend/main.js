@@ -21,6 +21,13 @@ const step2 = document.getElementById('step-2');
 const step3 = document.getElementById('step-3');
 const step4 = document.getElementById('step-4');
 
+const escapeHtml = (value) => String(value ?? '')
+  .replaceAll('&', '&amp;')
+  .replaceAll('<', '&lt;')
+  .replaceAll('>', '&gt;')
+  .replaceAll('"', '&quot;')
+  .replaceAll("'", '&#039;');
+
 const moveToStep = (current, next) => {
   current.classList.remove('active');
   setTimeout(() => {
@@ -84,7 +91,7 @@ btnExpand.addEventListener('click', async () => {
     
     const data = await res.json();
     if (res.ok) {
-      resultBox.innerHTML = marked.parse(data.outline);
+      resultBox.innerHTML = marked.parse(escapeHtml(data.outline));
       resultBox.style.display = 'block';
       loader.style.display = 'none';
       btnNext.style.display = 'inline-flex';
@@ -131,7 +138,7 @@ btnIngest.addEventListener('click', async () => {
     
     const data = await res.json();
     if (res.ok) {
-      resultBox.innerHTML = `<h3>Knowledge Graph Built Successfully!</h3><pre style="white-space:pre-wrap;font-size:0.8rem;">${data.graph_summary}</pre>`;
+      resultBox.innerHTML = `<h3>Knowledge Graph Built Successfully!</h3><pre style="white-space:pre-wrap;font-size:0.8rem;">${escapeHtml(data.graph_summary)}</pre>`;
       resultBox.style.display = 'block';
       loader.style.display = 'none';
       btnNext.style.display = 'inline-flex';
@@ -169,7 +176,7 @@ btnHumanize.addEventListener('click', async () => {
     
     const data = await res.json();
     if (res.ok) {
-      resultBox.innerHTML = marked.parse(data.lit_review);
+      resultBox.innerHTML = marked.parse(escapeHtml(data.lit_review));
       resultBox.style.display = 'block';
       exportText.textContent = `🎉 Project exported successfully to: ${data.export_path}`;
       loader.style.display = 'none';
